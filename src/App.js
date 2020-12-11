@@ -4,6 +4,9 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import InfoBox from './InfoBox';
 import Map from './Map';
+import TData from './TData';
+import { sortData } from './util';
+import LineGraph from './LineGraph';
 
 
 //useEffect = Runs a piece of code
@@ -14,6 +17,7 @@ function App() {
   const [country, setCountry] = useState(["WorldWide"]);
   const [countries, setCountries] = useState([]);
   const [countryInfo, setCountryInfo] = useState({});
+  const [tableData, setTableData] = useState([]);
 
   useEffect(() => {
     fetch("https://disease.sh/v3/covid-19/all")
@@ -33,11 +37,15 @@ function App() {
         .then((data) => {
           const countries = data.map((country) => ({
             name: country.country,
-            value: country.countryInfo.iso2
+            value: country.countryInfo.iso2  //uk,usa,india
           }
           ));
+
+          const sortedData = sortData(data)
+          setTableData(sortedData);
           setCountries(countries);
-        })
+
+        });
 
     };
     getCountriesData();
@@ -91,9 +99,12 @@ function App() {
 
         </div>
         <div className="app__stats">
-          <InfoBox title="Coronavirus Cases" cases={countryInfo.todayCases} total={2000} />
-          <InfoBox title="Recoverd cases" cases={countryInfo.todayRecovered} total={3000} />
-          <InfoBox title="Deaths" cases={countryInfo.todayDeaths} total={4000} />
+          <InfoBox title="Coronavirus Cases"
+            cases={countryInfo.todayCases} total={2000} />
+          <InfoBox title="Recoverd cases"
+            cases={countryInfo.todayRecovered} total={3000} />
+          <InfoBox title="Deaths"
+            cases={countryInfo.todayDeaths} total={4000} />
           {/*info boxes*/}
         </div>
         {/*---------------------------------------------------------------------------------------------*/}
@@ -104,12 +115,18 @@ function App() {
       </div>
       {/*table */}
       {/*graph*/}
+      {/*------------------------------------------------------------------------------------------------------*/}
+
       <Card className="app__right">
         <CardContent>
-          <h3> Live cases by country</h3>
-          <h3> Worldwide new cases</h3>
+          <div className="app__information">
+            <h3>Live Cases by Country</h3>
+            <TData countries={tableData} />
+            <h3>Worldwide Cases Data</h3>
+            <LineGraph />
+            {/*graph data */}
+          </div>
         </CardContent>
-
       </Card>
 
     </div >
